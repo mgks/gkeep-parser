@@ -1,10 +1,10 @@
 {
-  "name": "package-name",
+  "name": "gkeep-parser",
   "version": "0.1.0",
-  "description": "A short, honest description of what this package does.",
+  "description": "Convert Google Keep Takeout exports (HTML) into structured JSON data.",
   "type": "module",
   "bin": {
-    "package-name": "dist/cli.js"
+    "gkeep-parser": "dist/cli.js"
   },
   "main": "./dist/index.js",
   "exports": {
@@ -19,42 +19,50 @@
   },
   "sideEffects": false,
   "scripts": {
-    "test": "node --import=tsx --test test/*.ts",
     "build": "tsup",
-    "prepublishOnly": "npm run build && npm test",
+    "prepublishOnly": "npm run build",
     "lint": "xo"
   },
   "keywords": [
-    "node",
-    "cli",
-    "npm",
-    "utility"
+    "google-keep",
+    "takeout",
+    "parser",
+    "converter",
+    "json",
+    "notes",
+    "migration"
   ],
   "author": {
-    "name": "mgks",
+    "name": "Ghazi Khan",
     "url": "https://mgks.dev"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mgks/package-name.git"
+    "url": "git+https://github.com/mgks/gkeep-parser.git"
   },
   "bugs": {
-    "url": "https://github.com/mgks/package-name/issues"
+    "url": "https://github.com/mgks/gkeep-parser/issues"
   },
-  "homepage": "https://github.com/mgks/package-name#readme",
+  "homepage": "https://github.com/mgks/gkeep-parser#readme",
   "funding": "https://github.com/sponsors/mgks",
+  "dependencies": {
+    "cheerio": "^1.1.2",
+    "commander": "^11.1.0",
+    "dayjs": "^1.11.10"
+  },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "tsup": "^8.0.0",
-    "tsx": "^4.0.0",
-    "typescript": "^5.0.0",
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.1",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
     "xo": "^0.56.0"
   },
   "xo": {
     "prettier": true,
     "rules": {
-      "unicorn/filename-case": "off"
+      "unicorn/filename-case": "off",
+      "import/extensions": "off"
     }
   }
 }

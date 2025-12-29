@@ -1,6 +1,6 @@
 {
   "name": "gkeep-parser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Convert Google Keep Takeout exports (HTML) into structured JSON data.",
   "type": "module",
   "bin": {

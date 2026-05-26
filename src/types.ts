@@ -3,8 +3,8 @@ export interface KeepNote {
   content: string; // HTML content
   textContent: string; // Plain text
   tags: string[];
-  created: string; // ISO Date
-  updated: string; // ISO Date
+  created?: string; // ISO Date
+  updated?: string; // ISO Date
   isArchived: boolean;
   isPinned: boolean;
   isTrashed: boolean;

@@ -31,9 +31,11 @@ export function parseKeepHtml(htmlContent: string): KeepNote {
 
   // 4. Dates
   // Keep HTML structure: <div class="heading"> ... <div class="date">Oct 10, 2023, 1:00 PM</div> ... </div>
-  const dateStr = $('.heading').text().trim(); 
+  let dateStr = $('.heading .date').text().trim();
+  if (!dateStr) dateStr = $('.date').text().trim();
+  if (!dateStr) dateStr = $('.heading').text().trim(); 
   
-  // Parse date - fallback to current if parsing fails
+  // Parse date - fallback to undefined if parsing fails
   const created = parseDate(dateStr);
   const updated = created; // Keep doesn't distinguish nicely in HTML export
 
@@ -66,12 +68,12 @@ export function parseKeepHtml(htmlContent: string): KeepNote {
 /**
  * Helper to parse loose date strings from Google Takeout
  */
-function parseDate(dateStr: string): string {
-  if (!dateStr) return new Date().toISOString();
+function parseDate(dateStr: string): string | undefined {
+  if (!dateStr) return undefined;
   
   // Try DayJS standard parsing first
   const d = dayjs(dateStr);
   if (d.isValid()) return d.toISOString();
 
-  return new Date().toISOString();
+  return undefined;
 }

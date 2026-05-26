@@ -47,16 +47,19 @@
   "homepage": "https://github.com/mgks/gkeep-parser#readme",
   "funding": "https://github.com/sponsors/mgks",
   "dependencies": {
-    "cheerio": "^1.1.2",
+    "cheerio": "^1.2.0",
     "commander": "^11.1.0",
-    "dayjs": "^1.11.10"
+    "dayjs": "^1.11.20"
   },
   "devDependencies": {
-    "@types/node": "^20.10.0",
-    "tsup": "^8.0.1",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3",
+    "@types/node": "^20.19.41",
+    "tsup": "^8.5.1",
+    "tsx": "^4.22.3",
+    "typescript": "^5.9.3",
     "xo": "^0.56.0"
+  },
+  "overrides": {
+    "minimatch": ">=9.0.7"
   },
   "xo": {
     "prettier": true,

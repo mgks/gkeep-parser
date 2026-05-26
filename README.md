@@ -4,18 +4,10 @@
 
 <p>
   <img src="https://img.shields.io/npm/v/gkeep-parser.svg?style=flat-square&color=d25353" alt="npm version">
-  <img src="https://img.shields.io/bundlephobia/minzip/gkeep-parser?style=flat-square&color=38bd24" alt="size">
-  <img src="https://img.shields.io/npm/dt/gkeep-parser.svg?style=flat-square&color=38bd24" alt="npm downloads">
   <img src="https://img.shields.io/github/license/mgks/gkeep-parser.svg?style=flat-square&color=blue" alt="license">
 </p>
 
 A lightweight Node.js library and CLI tool that turns the messy HTML files from a Google Takeout export into clean, structured JSON — ready for import into Apple Notes, Evernote, Obsidian, or any other note-taking tool.
-
-## What's New in v0.2.0
-
-*   **Accurate date extraction:** The parser now targets `.heading .date` and `.date` CSS classes specifically, avoiding false positives from surrounding heading text.
-*   **Explicit parse failure signal:** `created` and `updated` are now `undefined` when the date cannot be parsed (instead of silently defaulting to today). Consumer apps can detect this and fall back to the file's own last-modified timestamp, so notes always get a meaningful date.
-*   **`._keep` file support:** Recognises both `.html` and `._keep` extensions from Takeout exports.
 
 ## Installation
 
@@ -30,6 +22,10 @@ npm install gkeep-parser
 ## Usage
 
 ### CLI
+
+1. Download your data from [Google Takeout](https://takeout.google.com/) (Select "Keep" only).
+2. Extract the ZIP file.
+3. Run the parser on the folder:
 
 ```bash
 # Parse a single HTML file

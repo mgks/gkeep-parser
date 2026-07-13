@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { createRequire } from 'node:module';
 import { parseKeepHtml } from './index.js';
 import { KeepNote } from './types.js';
 
-// 1. Clean Metadata Loading
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json');
 
@@ -18,49 +17,64 @@ program
   .version(pkg.version, '-v, --version')
   .helpOption('-h, --help', 'Display help');
 
+// Resolve the path argument to either a single HTML file or a directory
+// containing one. Lets the same CLI command handle both "parse one note" and
+// "parse a Takeout folder" cases the README promises.
+function resolveInputs(target: string): string[] {
+  const stat = fs.lstatSync(target);
+  if (stat.isFile()) return [target];
+  if (stat.isDirectory()) {
+    return fs.readdirSync(target)
+      .filter(f => f.toLowerCase().endsWith('.html'))
+      .map(f => path.join(target, f));
+  }
+  throw new Error(`Not a file or directory: ${target}`);
+}
+
 program
   .command('to-json')
-  .description('Convert a directory of Google Keep HTML files to a JSON file')
-  .argument('<directory>', 'Path to "Takeout/Keep" folder')
+  .description('Convert a Keep HTML file (or a folder of HTML files) to JSON')
+  .argument('<path>', 'Path to a single .html file or a Takeout/Keep folder')
   .option('-o, --output <file>', 'Output JSON file path', 'keep-notes.json')
   .option('-p, --pretty', 'Pretty print JSON', true)
-  .action((dir, options) => {
+  .action((target, options) => {
     try {
-      if (!fs.existsSync(dir) || !fs.lstatSync(dir).isDirectory()) {
-        throw new Error(`Directory not found: ${dir}`);
+      if (!fs.existsSync(target)) {
+        throw new Error(`Path not found: ${target}`);
       }
 
-      console.log(`📂 Reading files from ${dir}...`);
-      
-      // Filter for HTML files only
-      const files = fs.readdirSync(dir).filter(f => f.toLowerCase().endsWith('.html'));
-      
+      const files = resolveInputs(target);
       if (files.length === 0) {
-        throw new Error("No HTML files found in this directory.");
+        throw new Error('No .html files found at this path.');
       }
 
-      console.log(`⏳ Parsing ${files.length} notes...`);
-      const notes: KeepNote[] = [];
+      console.log(`📂 Reading ${files.length} file(s) from ${target}...`);
 
+      const notes: KeepNote[] = [];
+      const skipped: string[] = [];
       for (const file of files) {
         try {
-          const content = fs.readFileSync(path.join(dir, file), 'utf-8');
+          const content = fs.readFileSync(file, 'utf-8');
           const note = parseKeepHtml(content);
-          if (note) notes.push(note);
-        } catch (e) {
-          // Skip individual corrupt files but continue
+          notes.push(note);
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : String(e);
+          skipped.push(`${file}: ${msg}`);
         }
       }
 
-      const json = options.pretty 
-        ? JSON.stringify(notes, null, 2) 
+      for (const s of skipped) console.warn(`⚠️  Skipped ${s}`);
+
+      const json = options.pretty
+        ? JSON.stringify(notes, null, 2)
         : JSON.stringify(notes);
 
       fs.writeFileSync(options.output, json);
-      console.log(`✅ Success! Saved ${notes.length} notes to ${options.output}`);
-
-    } catch (e: any) {
-      console.error(`❌ Error: ${e.message}`);
+      const tail = skipped.length === 0 ? '' : ` (${skipped.length} skipped)`;
+      console.log(`✅ Saved ${notes.length} notes to ${options.output}${tail}`);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error(`❌ Error: ${msg}`);
       process.exit(1);
     }
   });
@@ -69,6 +83,7 @@ program.addHelpText('after', `
 Examples:
   $ gkeep-parser to-json ./Takeout/Keep
   $ gkeep-parser to-json ./Takeout/Keep -o my-notes.json
+  $ gkeep-parser to-json ./MyNote.html -o single.json
 `);
 
 program.parse();
